@@ -1,0 +1,11 @@
+{
+  "name": "funtrivia",
+  "version": "1.0.0",
+  "description": "FunTrivia: a trivia adventure across nine realms of knowledge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "test": "node --test tests/*.test.js"
+  }
+}
