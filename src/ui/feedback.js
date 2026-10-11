@@ -38,6 +38,11 @@ function open(app) {
   };
   $("#fb-copy", m.root).onclick = async () => {
     const txt = list.map((f) => `[${f.date}] ${f.kind} (${f.where}): ${f.text}`).join("\n");
-    try { await navigator.clipboard.writeText(txt); toast("Feedback copied to clipboard."); } catch { toast("Couldn't reach the clipboard."); }
+    try {
+      const mac = window.webkit?.messageHandlers?.clipboard; // inside the Mac app
+      if (mac) mac.postMessage(txt);
+      else await navigator.clipboard.writeText(txt);
+      toast("Feedback copied to clipboard.");
+    } catch { toast("Couldn't reach the clipboard."); }
   };
 }

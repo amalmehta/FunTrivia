@@ -1,6 +1,6 @@
 # FunTrivia
 
-A trivia adventure in the browser. You explore nine realms of knowledge on an illustrated map, clear landmarks, defeat each realm's guardian and build up your own Haven, learning a new fact with every question.
+A trivia adventure for the browser and the Mac. You explore nine realms of knowledge on an illustrated map, clear landmarks, defeat each realm's guardian and build up your own Haven, learning a new fact with every question.
 
 ![World map](docs/screenshots/World%20Map.jpg)
 
@@ -24,7 +24,12 @@ flowchart LR
   F --> B
 ```
 
-**Play:** `npm start`, then open http://localhost:5173
+**Mac app:**
+
+![FunTrivia on the Mac](docs/screenshots/Mac%20App.jpg)
+
+**Play in the browser:** `npm start`, then open http://localhost:5173
+**Build the Mac app:** `mac/build.sh` makes `build/FunTrivia.app` and `build/FunTrivia.dmg`
 
 - [How to set up, run and play](docs/INSTRUCTIONS.md)
 - [System design](docs/SYSTEM-DESIGN.md)

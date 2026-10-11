@@ -1,6 +1,8 @@
 # FunTrivia System Design
 
-FunTrivia is a static, client-only web game. The browser loads plain ES modules, draws every picture as procedural SVG, and saves progress in `localStorage`. There is no backend, no build step and no dependencies.
+FunTrivia is a static, client-only web game. The browser loads plain ES modules, draws every picture as procedural SVG, and saves progress in `localStorage`. There is no backend, no build step for the website and no dependencies.
+
+The Mac app is a small native shell around the same game. It is a Swift/AppKit window whose WebKit view serves the bundled game files, so there is one game codebase for both.
 
 ## Architecture
 
@@ -24,6 +26,13 @@ flowchart TB
     State <--> LS[(localStorage<br/>funtrivia.save.v1)]
   end
   Server[scripts/serve.js<br/>static files] -. serves .-> HTML
+  subgraph MacApp[FunTrivia.app]
+    Shell[main.swift<br/>window, menus, ⌘,] --> WK[WKWebView]
+    WK --> Scheme[funtrivia:// handler]
+    Scheme --> Bundle[(Resources/web<br/>same game files)]
+    Shell -. "Settings… → funTrivia.openSettings()" .-> WK
+    WK -. "clipboard bridge" .-> Shell
+  end
 ```
 
 ## Components
@@ -38,6 +47,8 @@ flowchart TB
 | `ui/*` | One module per view or dialog. Each renders HTML into the view container and wires up events. |
 | `main.js` | Boots the app, applies settings (theme, motion, sound), draws the top bar, routes on `location.hash`, and handles ⌘,. |
 | `scripts/serve.js` | A tiny static server for local play. In production, any static host works. |
+| `mac/Sources/main.swift` | The Mac app:<br/>• the window, which remembers its size and position<br/>• the menu bar: About, Settings… ⌘,, Edit, View (Reload, Full Screen), Window, Help<br/>• a `funtrivia://` URL scheme handler that serves the bundled game<br/>• native confirm dialogs<br/>• a clipboard bridge<br/>• links opening in the default browser<br/>• a headless self-test mode |
+| `mac/build.sh` | Builds the app: compiles a universal binary with `swiftc`, copies the game in, renders the icon, writes `Info.plist`, signs, and makes the DMG. There is no Xcode project. |
 
 ## Main flows
 
@@ -59,6 +70,11 @@ flowchart TB
 
 **Haven.** `engine.canBuild` checks the realm's cleared landmarks (1, 3, 5) and gem cost (30, 70, 140) for each tier. `state.build` spends the gems and raises the tier.
 
+**Mac app launch.**
+1. `main.swift` builds the menu bar and creates a WebKit view whose `funtrivia://` scheme serves files from `Contents/Resources/web`.
+2. It loads `funtrivia://app/index.html`, and the game boots exactly as it does on the web.
+3. Choosing **Settings…** (⌘,) in the menu calls `window.funTrivia.openSettings()` in the page.
+
 ## Where data lives
 
 | Data | Location | Notes |
@@ -66,6 +82,7 @@ flowchart TB
 | Questions, lore, guides | `data/realms/*.js` (shipped with the site) | Static and hand-checked. ES modules, so no fetch or JSON parsing. |
 | Player progress | `localStorage["funtrivia.save.v1"]` | One JSON object; its shape is in `state.freshState()`. |
 | Feedback notes | Inside the same save (`feedback[]`) | Kept when progress is reset. Copied out by the user. |
+| Mac app progress | WebKit's default data store for `com.amalmehta.funtrivia` (`localStorage` on the `funtrivia://app` origin) | Separate from browser saves. Persists across launches (checked by `mac/test.sh`). |
 
 ## Key decisions and trade-offs
 
@@ -75,6 +92,10 @@ flowchart TB
 - **Colors follow similarity.** Each region is one hue family: science is teal to blue, the human story is red to gold, and the arts are violet to pink. Realms within a region sit far enough apart in hue to tell at a glance, and each has its own light and dark shade.
 - **Fixed questions per landmark.** Questions are sorted by tier and sliced, so each landmark always teaches the same six facts and replays are about mastery. Answer order is reshuffled every time.
 - **Progress lives only in `localStorage`.** It is private and needs no accounts, but progress doesn't follow you to another browser or device.
+- **The Mac app is a native shell, not a rewrite.** There is one game codebase, so a fix lands on both web and Mac. The app is about 1.3 MB and works offline. The trade-off is that the game UI is web-rendered rather than native AppKit controls, though the menus, Settings shortcut, dialogs and window behavior are native.
+- **It serves the game through a custom `funtrivia://` scheme instead of `file://`.** WebKit blocks ES modules loaded from `file://` URLs. A scheme handler gives the game a stable origin, so modules and `localStorage` work. The trade-off is that the web clipboard API isn't available there, so a small native bridge handles "Copy all".
+- **It is built with `swiftc` and a shell script instead of an Xcode project.** The build is easy to read and diff and runs from the terminal. The trade-off is no Xcode project to open, though one could be added later.
+- **Signing uses a local identity.** The app runs on the Mac that built it. Distributing it to other Macs needs an Apple Developer ID and notarization.
 - **Feedback is stored locally.** No data leaves the browser. The user copies notes out by hand.
 
 ## How it's tested
@@ -83,6 +104,10 @@ flowchart TB
   - **engine:** level slicing, answers staying correct after shuffling, scoring order, stars, the XP curve, unlock order, level gating, build rules, the daily seed, streaks.
   - **state:** save round-trip and recovery from corrupt data, rewards, stars never dropping, Echoes clearing, realm unveiling, the once-a-day gem payout, building.
   - **content:** every realm has 5 landmarks and 30 questions split 10/10/10, unique ids, 4 distinct choices, a valid answer index and a fact, and no question appears twice anywhere.
+- `mac/test.sh` launches the built app invisibly (it needs no screen access), checks three things and saves window snapshots:
+  1. The game boots with no JavaScript errors and the Settings hook exists.
+  2. `localStorage` survives a relaunch.
+  3. A demo save opens the world map.
 - Manual check in a browser:
   - onboarding
   - map in day and night themes
@@ -102,3 +127,6 @@ flowchart TB
 - Chrome may keep ⌘, for itself in some setups. The gear button always opens Settings.
 - On phones, the map and realm panoramas pan sideways instead of shrinking, so landmarks stay tappable.
 - Sounds are synthesized blips. There is no music.
+- The Mac app is signed with a local identity and not notarized, so Gatekeeper on other Macs blocks it until it is right-clicked and opened.
+- The Mac app has no auto-update. Rebuild it to pick up game changes.
+- The Mac app has its own save. It doesn't share progress with the website in a browser.

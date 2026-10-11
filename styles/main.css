@@ -197,7 +197,11 @@ kbd { font: 600 .72em var(--sans); padding: .1em .45em; border-radius: 5px; bord
 .realm-node > *:not(.node-label):not(.node-stars):not(.node-lock):not(.node-shadow) { transition: transform .25s cubic-bezier(.3,1.6,.5,1); }
 .realm-node.open:hover .node-disc, .realm-node.open:focus-visible .node-disc, .realm-node.open:hover .node-ring, .realm-node.open:hover .node-ring-bg, .realm-node.open:hover .node-sheen { transform: scale(1.08); }
 .realm-node.open:focus-visible .node-label rect { stroke-width: 4; }
-.realm-node.locked { filter: grayscale(.85) brightness(.95); opacity: .85; }
+/* Locked realms are greyed with plain fills (Safari/WebKit ignores CSS filter on SVG groups). */
+.realm-node.locked { opacity: .9; cursor: default; }
+.realm-node.locked .node-disc { fill: #8d93a5; }
+.realm-node.locked .node-halo { opacity: 0; }
+.realm-node.locked .node-label rect { stroke: #8d93a5; }
 .realm-node.locked .node-glyph { opacity: .35; }
 .realm-node .node-lock g { stroke: var(--map-ink); }
 

@@ -75,6 +75,17 @@ Decided without asking:
 - The feedback tab stores notes locally and offers "Copy all", because there is no backend to send them to.
 - README, INSTRUCTIONS and FILE-STRUCTURE docs were written now so they are ready when the repo goes on GitHub.
 
+Mac app (asked and answered, 2026-10-11):
+- Approach: a native Swift/AppKit shell around the same game files, not a SwiftUI rewrite or Electron/Tauri.
+- Packaging: a .app plus a DMG, signed with the local code-signing identity. Not notarized.
+- Location: the mac/ folder in the same repo.
+
+Mac app (decided without asking):
+- Menu bar: About, Settings… (⌘,), Hide/Quit, Edit, View (Reload, Full Screen), Window, Help (opens the guide on GitHub). No extra navigation menu was added; that is a proposal.
+- Bundle id com.amalmehta.funtrivia, minimum macOS 13, universal binary (Apple silicon and Intel).
+- The app keeps its own save, separate from the browser.
+- The self-test mode (environment variables) exists for mac/test.sh, because screen control was declined during verification.
+
 CHANGELOG:
 
 - 2026-10-11 — created
@@ -97,3 +108,4 @@ CHANGELOG:
 - 2026-10-08 — added meta-instruction: color-code tags by similarity (related share a hue family, each distinct)
 - 2026-10-09 — added meta-instruction: apps that take files have an Upload button, drop anywhere, and paste
 - 2026-10-11 — built v1 of the FunTrivia website: 9 realms, 270 questions, world map, realm trails, quiz, Haven, Codex, daily expedition, settings, feedback tab, tests and docs
+- 2026-10-11 — added the Mac app (mac/): native shell, menus with Settings ⌘,, app icon, DMG build, headless smoke test; fixed locked realms not greying out in Safari/WebKit

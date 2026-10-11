@@ -15,6 +15,38 @@ The game has to be served over HTTP because it uses ES modules, so opening `inde
 
 The display fonts (Cinzel and Inter) load from Google Fonts. Offline, the game falls back to system fonts and still works.
 
+## Build the Mac app
+
+You need Xcode, or its command line tools, on macOS 13 or newer.
+
+```bash
+mac/build.sh
+```
+
+This writes two things to `build/`:
+- `FunTrivia.app`, a universal app for Apple silicon and Intel
+- `FunTrivia.dmg`, a disk image with a drag-to-Applications shortcut
+
+To build only the app, run `mac/build.sh --no-dmg`.
+
+Open the DMG and drag FunTrivia into Applications, or run the app straight from `build/`.
+
+**Signing.** The script signs with `$SIGN_IDENTITY` if it's set. Otherwise it uses the first code-signing identity in your keychain, and if there is none, an ad-hoc signature. Either way the app runs on the Mac that built it. On other Macs, Gatekeeper blocks it until it is notarized with an Apple Developer ID. Until then, someone on another Mac can right-click the app and choose **Open** the first time.
+
+**Using the Mac app:**
+- **Settings…** (⌘,) is in the FunTrivia menu.
+- The View menu has **Reload** (⌘R) and **Enter Full Screen** (⌃⌘F).
+- **Help → FunTrivia Help** opens this guide in your browser.
+- Progress is saved by the app, separately from any browser.
+
+Test the built app with:
+
+```bash
+mac/test.sh
+```
+
+It runs the app invisibly and needs no screen access. It checks that the game boots with no errors and that saved data survives a relaunch, then renders a demo world. It saves snapshots to `build/` as `Snapshot Launch.png` and `Snapshot World Map.png`.
+
 ## Run the tests
 
 ```bash

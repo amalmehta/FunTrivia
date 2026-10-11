@@ -35,6 +35,8 @@ const app = {
   },
   refreshHud,
   route: () => route(),
+  // Called by the Mac app's Settings… menu item (⌘,).
+  openSettings() { if (!document.querySelector(".settings-modal")) openSettings(app); },
 };
 window.funTrivia = app; // handy for debugging in the console
 
@@ -82,7 +84,7 @@ async function route() {
 document.addEventListener("keydown", (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key === ",") {
     e.preventDefault();
-    if (!modalIsOpen()) openSettings(app);
+    if (!modalIsOpen()) app.openSettings();
   }
 });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (app.state.prefs.theme === "system") route(); });

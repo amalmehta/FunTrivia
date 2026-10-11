@@ -31,6 +31,13 @@ FunTrivia/
 │   ├── cosmos.js  wilds.js  lab.js          (The Azure Reaches: science)
 │   ├── history.js geography.js myth.js      (The Ember Lands: the human story)
 │   └── music.js   lit.js    art.js          (The Violet Isles: the arts)
+├── mac/                  The Mac app
+│   ├── Sources/main.swift  Native shell: window, menu bar, Settings (⌘,), funtrivia:// file server, self-test
+│   ├── Tools/RenderIcon.swift  Renders Icon.svg into the app icon sizes
+│   ├── Icon.svg          App icon artwork
+│   ├── build.sh          Builds build/FunTrivia.app and build/FunTrivia.dmg
+│   └── test.sh           Headless smoke test of the built app
+├── build/                Build output (not committed)
 ├── tests/                Node test runner suites (engine, state, content)
 ├── scripts/serve.js      Zero-dependency static server used by `npm start`
 ├── docs/
