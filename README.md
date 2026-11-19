@@ -34,3 +34,7 @@ flowchart LR
 - [How to set up, run and play](docs/INSTRUCTIONS.md)
 - [System design](docs/SYSTEM-DESIGN.md)
 - [What's where](docs/FILE-STRUCTURE.md)
+
+## How it was built
+
+How this was built and how it works, with diagrams: [docs/HOW-IT-WAS-BUILT.md](docs/HOW-IT-WAS-BUILT.md)
