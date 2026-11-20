@@ -6,7 +6,7 @@ FunTrivia is a trivia game that plays like an adventure. It is for anyone who wa
 ## Build history
 
 ```mermaid
-flowchart LR
+flowchart TD
   idea["Idea: make learning trivia fun, with levels, world building, topics the player picks and rich visuals"]
   d1["Decision: curated built-in question bank"]
   d2["Decision: keep it local, not on GitHub for now"]
